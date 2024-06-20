@@ -30,7 +30,7 @@ figures_pos = [
 ]
 
 # Colors for the figures
-colors = ["#26549e", "#2e8abf", "#b82c2c", "#44b521", "#1f1db3", "#d6991e", "#522cc9"]
+colors = ["#26549e", "#3297c2", "#b82c2c", "#87229c", "#53a630", "#a3961f", "#3e19b5"]
 
 # Create figure instances with colors
 figures = [
@@ -44,7 +44,7 @@ field = [[0 for _ in range(W)] for _ in range(H)]
 # Game variables
 anim_count, anim_speed, anim_limit = 0, 40, 2000
 move_speed = 1  # Adjust move_speed for immediate response
-move_count, move_limit = 0, 4  # Adjust move_limit for controlling movement frequency
+move_count, move_limit = 0, 3  # Adjust move_limit for controlling movement frequency
 
 # Initialize figure
 figure, color = deepcopy(choice(figures))
