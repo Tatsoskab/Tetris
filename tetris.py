@@ -7,14 +7,21 @@ pygame.init()
 
 # Constants
 W, H = 10, 20
-TILE = 45
+TILE = 40
 GAME_RES = W * TILE, H * TILE
+RES = 1090, 815
+
 FPS = 60
 
 # Initialize Pygame display
-window = pygame.display.set_mode(GAME_RES)
+sc = pygame.display.set_mode(RES)
+window = pygame.Surface(GAME_RES)
 clock = pygame.time.Clock()
 
+# Game over
+def Game_over():
+    if rect.y < 0:
+        pygame.quit()
 # Grid setup
 grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(W) for y in range(H)]
 
@@ -29,6 +36,10 @@ figures_pos = [
     [(0, 0), (0, -1), (0, 1), (-1, 0)],    # Z shape
 ]
 
+#images 
+bg = pygame.image.load("images/background.jpg").convert()
+bg = pygame.transform.scale(bg, RES)
+game_bg = pygame.image.load("images/res.jpg").convert()
 # Colors for the figures
 colors = ["#26549e", "#2e8abf", "#b82c2c", "#44b521", "#1f1db3", "#d6991e", "#522cc9"]
 
@@ -59,9 +70,11 @@ def check_borders():
 # Main game loop
 run = True
 while run:
+    sc.blit(bg,(0,0))
+    sc.blit(window,(50,10))
+    window.blit(game_bg,(0,0))
     keys = pygame.key.get_pressed()
     dy, dx, rotate = 0, 0, False
-    window.fill(pygame.Color("black"))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -113,7 +126,7 @@ while run:
 
     # Drawing code
     for rect in grid:
-        pygame.draw.rect(window, (40, 40, 40), rect, 1)
+        pygame.draw.rect(window, ("#595959"), rect, 1)
     for rect in figure:
         figure_rect.x = rect.x * TILE
         figure_rect.y = rect.y * TILE
@@ -148,7 +161,7 @@ while run:
             field[line][i] = field[row][i]
         if count < W:
             line -= 1
-
+    Game_over()
     pygame.display.update()
     clock.tick(FPS)
 
