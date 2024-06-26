@@ -19,11 +19,6 @@ window = pygame.Surface(GAME_RES)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Tetris")
 
-# Game over
-def Game_over():
-    if rect.y < 0:
-        pygame.quit()
-
 # Grid setup
 grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(W) for y in range(H)]
 
@@ -37,7 +32,9 @@ figures_pos = [
     [(0, 0), (0, -1), (0, 1), (1, -1)],    # T shape
     [(0, 0), (0, -1), (0, 1), (-1, 0)],    # Z shape
 ]
-
+#score
+score, lines = 0, 0
+scores = {0:0,1:100,2:300,3:700, 4: 1500}
 # Images
 bg = pygame.image.load("images/background.jpg").convert()
 bg = pygame.transform.scale(bg, RES)
@@ -59,7 +56,8 @@ field = [[0 for _ in range(W)] for _ in range(H)]
 main_font = pygame.font.Font("font/font.ttf", 150)
 font = pygame.font.Font("font/font.ttf", 45)
 title_tetris = main_font.render("TETRIS", True, pygame.Color("black"))
-
+title_score = font.render("score:", True, pygame.Color("green"))
+title_record = font.render("record:", True, pygame.Color("purple"))
 # Game variables
 anim_count, anim_speed, anim_limit = 0, 70, 2000
 move_speed = 1  # Adjust move_speed for immediate response
@@ -78,7 +76,7 @@ def check_borders():
 
 # Function to draw the next figure
 def draw_next_figure(screen, next_figure, next_color):
-    next_grid_x, next_grid_y = 320 , 100  # Position for the next shape grid
+    next_grid_x, next_grid_y = 340 , 130  # Position for the next shape grid
     for rect in next_figure:
         next_rect = pygame.Rect(
             rect.x * TILE + next_grid_x, 
@@ -86,15 +84,34 @@ def draw_next_figure(screen, next_figure, next_color):
             TILE - 2, TILE - 2
         )
         pygame.draw.rect(screen, next_color, next_rect)
+def get_record():
+    try:
+        with open("record") as f:
+            return f.readline()
+    except FileNotFoundError:
+        with open("record", "w") as f:
+            f.write("0")
 
+def set_record(record, score):
+    rec = max(int(record), score)
+    with open("record", "w") as f:
+        f.write(str(rec))
 # Main game loop
 run = True
 while run:
+    record = get_record()
     sc.blit(bg, (0, 0))
     sc.blit(window, (50, 10))
+    window.fill((0,0,0))
     window.blit(game_bg, (0, 0))
     keys = pygame.key.get_pressed()
     dy, dx, rotate = 0, 0, False
+
+    #delay
+    for i in range(lines):
+        pygame.time.wait(200)
+
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -177,7 +194,7 @@ while run:
             anim_limit = 2000
 
     # Check Lines
-    line = H - 1
+    line, lines = H - 1, 0
     for row in range(H - 1, -1, -1):
         count = 0
         for i in range(W):
@@ -186,10 +203,28 @@ while run:
             field[line][i] = field[row][i]
         if count < W:
             line -= 1
+        else:
+            anim_speed += 3
+            lines += 1
+    score += scores[lines]
 
-    Game_over()
 
     sc.blit(title_tetris, (600, 0))
+    sc.blit(title_score, (535, 750))
+    sc.blit(font.render(str(score), True,pygame.Color("white")), (645, 750))
+    sc.blit(title_record,(525, 650))
+    sc.blit(font.render(str(record), True,pygame.Color("white")), (645, 650))
+    for i in range(W):
+        if field[0][i]:
+            set_record(record,score)
+            field = [[0 for i in range(W)] for i in range(H)]
+            anim_count, anim_speed, anim_limit = 0, 70, 2000
+            score = 0
+            for i_rect in grid:
+                pygame.draw.rect(window,color,i_rect)
+                sc.blit(window,(50,10))
+                pygame.display.flip()
+                clock.tick(1000)
 
     pygame.display.update()
     clock.tick(FPS)
