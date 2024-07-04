@@ -107,12 +107,6 @@ while run:
     keys = pygame.key.get_pressed()
     dy, dx, rotate = 0, 0, False
 
-    #delay
-    for i in range(lines):
-        pygame.time.wait(200)
-
-
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
